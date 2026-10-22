@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ object.title }} · Notes{% endblock %}
+{% block content %}
+<article class="card">
+  <h1>{% if object.is_pinned %}📌 {% endif %}{{ object.title }}</h1>
+  <p class="muted">Created {{ object.created_at|date:"d M Y, H:i" }} · Updated {{ object.updated_at|date:"d M Y, H:i" }}</p>
+  <div class="body">{{ object.content|linebreaks }}</div>
+  <div class="actions">
+    <a class="btn" href="{% url 'note-update' object.pk %}">Edit</a>
+    <form method="post" action="{% url 'note-pin' object.pk %}" class="inline">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ object.get_absolute_url }}">
+      <button class="btn ghost" type="submit">{% if object.is_pinned %}Unpin{% else %}Pin{% endif %}</button>
+    </form>
+    <a class="btn danger" href="{% url 'note-delete' object.pk %}">Delete</a>
+    <a class="btn ghost" href="{% url 'note-list' %}">← Back</a>
+  </div>
+</article>
+{% endblock %}

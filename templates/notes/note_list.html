@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<form method="get" class="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search notes…">
+  <button class="btn" type="submit">Search</button>
+  {% if q %}<a class="btn ghost" href="{% url 'note-list' %}">Clear</a>{% endif %}
+</form>
+
+{% if notes %}
+<div class="grid">
+  {% for note in notes %}
+  <article class="card note{% if note.is_pinned %} pinned{% endif %}">
+    <h2><a href="{{ note.get_absolute_url }}">{{ note.title }}</a></h2>
+    <p>{{ note.content|truncatewords:30|linebreaksbr }}</p>
+    <footer>
+      <span class="muted">{{ note.updated_at|date:"d M Y, H:i" }}</span>
+      <form method="post" action="{% url 'note-pin' note.pk %}" class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button class="link" type="submit">{% if note.is_pinned %}📌 Unpin{% else %}Pin{% endif %}</button>
+      </form>
+    </footer>
+  </article>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav class="pager">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">← Newer</a>{% endif %}
+  <span class="muted">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">Older →</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<div class="card empty">
+  {% if q %}<p>No notes match “{{ q }}”.</p>{% else %}<p>No notes yet. <a href="{% url 'note-create' %}">Create your first one.</a></p>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

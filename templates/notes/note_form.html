@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit{% else %}New{% endif %} note · Notes{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>{% if object %}Edit note{% else %}New note{% endif %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn" type="submit">Save</button>
+    <a class="btn ghost" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'note-list' %}{% endif %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}
